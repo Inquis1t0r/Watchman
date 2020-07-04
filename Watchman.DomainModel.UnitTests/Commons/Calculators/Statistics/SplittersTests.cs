@@ -14,7 +14,7 @@ namespace Watchman.DomainModel.UnitTests.Commons.Calculators.Statistics
         [TestCase(5, 25, 5)]
         [TestCase(2, 10, 5)]
         [TestCase(1, 10, 10)]
-        public void DaySplitterTest(int days, int items, int shouldItemsPerDay)
+        public void DaySplitterTest(int days, int items, int expectedItemsPerDay)
         {
             //Arrange
             var splitter = new DaySplitter();
@@ -30,7 +30,7 @@ namespace Watchman.DomainModel.UnitTests.Commons.Calculators.Statistics
             var daysAreEqual = splitted.All(x => x.Value.Count() == itemsPerDay);
 
             Assert.That(timeRanges.Count(), Is.EqualTo(days));
-            Assert.That(itemsPerDay, Is.EqualTo(shouldItemsPerDay));
+            Assert.That(itemsPerDay, Is.EqualTo(expectedItemsPerDay));
             Assert.That(daysAreEqual, Is.True);
         }
 
@@ -41,7 +41,7 @@ namespace Watchman.DomainModel.UnitTests.Commons.Calculators.Statistics
         [TestCase(5, 25, 5)]
         [TestCase(2, 10, 5)]
         [TestCase(1, 10, 10)]
-        public void MonthSplitterTest(int months, int items, int shouldItemsPerMonth)
+        public void MonthSplitterTest(int months, int items, int expectedItemsPerMonth)
         {
             //Arrange
             var splitter = new MonthSplitter();
@@ -69,8 +69,9 @@ namespace Watchman.DomainModel.UnitTests.Commons.Calculators.Statistics
             var daysAreEqual = splitted.All(x => x.Value.Count() == itemsPerMonth);
 
             Assert.That(timeRanges.Count(), Is.EqualTo(months));
-            Assert.That(itemsPerMonth, Is.EqualTo(shouldItemsPerMonth));
+            Assert.That(itemsPerMonth, Is.EqualTo(expectedItemsPerMonth));
             Assert.That(daysAreEqual, Is.True);
         }
+
     }
 }
