@@ -41,6 +41,7 @@ namespace Watchman.Discord.Areas.Administration.Controllers
         [DiscordCommand("messages")]
         public async Task ReadUserMessages(DiscordRequest request, Contexts contexts)
         {
+            //user
             var mention = request.GetMention();
             var selectedUser = this._usersService.GetUserByMention(contexts.Server, mention);
             if (selectedUser == null)
@@ -80,6 +81,8 @@ namespace Watchman.Discord.Areas.Administration.Controllers
             await this._directMessagesService.TrySendMessage(contexts.User.Id, linesBuilder.ToString(), MessageType.BlockFormatted);
 
             await messagesService.SendResponse(x => x.SentByDmMessagesOfAskedUser(messages.Count, selectedUser));
+
+            //TODO channel
         }
 
         [AdminCommand]

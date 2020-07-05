@@ -18,6 +18,7 @@ namespace Devscord.DiscordFramework.Framework.Commands.Services
                 BotCommandPropertyType.Time => this.ToTimeSpan(value),
                 BotCommandPropertyType.Number => int.Parse(value),//TODO add more types
                 BotCommandPropertyType.Bool => bool.Parse(value),
+                BotCommandPropertyType.Text => this.ToUlong(value),
                 _ => value
             };
         }
