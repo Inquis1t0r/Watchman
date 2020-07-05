@@ -39,7 +39,7 @@ namespace Watchman.Discord.Areas.Administration.Controllers
 
         [AdminCommand]
         [DiscordCommand("messages")]
-        public async Task ReadUserMessages(DiscordRequest request, Contexts contexts)
+        public async Task OldReadUserMessages(DiscordRequest request, Contexts contexts)
         {
             //user
             var mention = request.GetMention();
@@ -84,6 +84,15 @@ namespace Watchman.Discord.Areas.Administration.Controllers
 
             //TODO channel
         }
+
+        [AdminCommand]
+        [DiscordCommand("messages")]
+        public async Task ReadUserMessages(MessagesCommand command, Contexts cotext)
+        {
+
+        }
+
+        
 
         [AdminCommand]
         public async Task SetRoleAsSafe(SetRoleCommand setRoleCommand, Contexts contexts)

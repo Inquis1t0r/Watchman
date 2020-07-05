@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Watchman.Discord.Areas.Administration.BotCommands
 {
-    class MessagesCommand : IBotCommand
+    public class MessagesCommand : IBotCommand
     {
         [UserMention]
         public ulong User { get; set; }
