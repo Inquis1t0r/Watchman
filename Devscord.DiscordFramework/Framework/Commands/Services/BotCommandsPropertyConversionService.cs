@@ -18,8 +18,21 @@ namespace Devscord.DiscordFramework.Framework.Commands.Services
                 BotCommandPropertyType.Time => this.ToTimeSpan(value),
                 BotCommandPropertyType.Number => int.Parse(value),//TODO add more types
                 BotCommandPropertyType.Bool => bool.Parse(value),
+                BotCommandPropertyType.Text => ulong.Parse(value), 
                 _ => value
             };
+        }
+
+        private ulong ToUlong(string value)
+        {
+            ulong result = 0;
+            var match = this._exMention.Match(value);
+            if (match.Success)
+            {
+                var mention = match.Groups["Mention"].Value;
+                result = ulong.Parse(mention);
+            }
+            return result;
         }
 
         private TimeSpan ToTimeSpan(string value)
