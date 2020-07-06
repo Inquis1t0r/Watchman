@@ -38,7 +38,7 @@ namespace Watchman.Discord.Areas.Administration.Controllers
         }
 
         [AdminCommand]
-        [DiscordCommand("messages")]
+        [DiscordCommand("oldmessages")]
         public async Task OldReadUserMessages(DiscordRequest request, Contexts contexts)
         {
             //user
@@ -86,10 +86,13 @@ namespace Watchman.Discord.Areas.Administration.Controllers
         }
 
         [AdminCommand]
-        [DiscordCommand("messages")]
-        public async Task ReadUserMessages(MessagesCommand command, Contexts cotext)
-        {
-
+        [MessagesCommand("messages")]
+        public async Task ReadUserMessages(MessagesCommand command, Contexts contexts)
+        {     
+            var mention = command.User.ToString();
+            //await this._directMessagesService.TrySendMessage(contexts.User.Id, "test messages" + mention);
+            var messagesService = this._messagesServiceFactory.Create(contexts);
+            await messagesService.SendResponse(x => x.SentContentOfAskedChannel(contexts.User));
         }
 
         

@@ -146,6 +146,12 @@ namespace Devscord.DiscordFramework.Framework.Commands.Responses
                 new KeyValuePair<string, string>("user", user.Name));
         }
 
+        public static string SentContentOfAskedChannel(this ResponsesService responsesService, UserContext user)
+        {
+            return responsesService.ProcessResponse("SentContentOfAskedChannel",
+                new KeyValuePair<string, string>("user", user.Name));
+        }
+
         public static string NumberOfMessagesIsHuge(this ResponsesService responsesService, int numberOfMessages)
         {
             return responsesService.ProcessResponse("NumberOfMessagesIsHuge",

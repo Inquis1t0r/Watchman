@@ -6,8 +6,15 @@ using System.Text;
 
 namespace Watchman.Discord.Areas.Administration.BotCommands
 {
-    public class MessagesCommand : IBotCommand
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public class MessagesCommand : Attribute, IBotCommand
     {
+       public string Command { get; private set; }
+        public MessagesCommand(string command)
+        {
+            this.Command = command;
+        }
+
         [UserMention]
         public ulong User { get; set; }
         [ChannelMention]
