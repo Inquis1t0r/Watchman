@@ -17,9 +17,12 @@ using Watchman.DomainModel.DiscordServer.Commands;
 using Watchman.DomainModel.Messages.Queries;
 using Watchman.Discord.Areas.Users.Services;
 using Watchman.Discord.Areas.Administration.BotCommands;
+using Devscord.DiscordFramework.Framework.Commands.Services;
+using System.Text.RegularExpressions;
 
 namespace Watchman.Discord.Areas.Administration.Controllers
 {
+
     public class AdministrationController : IController
     {
         private readonly IQueryBus _queryBus;
@@ -27,6 +30,8 @@ namespace Watchman.Discord.Areas.Administration.Controllers
         private readonly DirectMessagesService _directMessagesService;
         private readonly MessagesServiceFactory _messagesServiceFactory;
         private readonly RolesService _rolesService;
+
+        private readonly Regex _exMention = new Regex(@"<@&?(?<Mention>\d+)>", RegexOptions.Compiled);
 
         public AdministrationController(IQueryBus queryBus, UsersService usersService, DirectMessagesService directMessagesService, MessagesServiceFactory messagesServiceFactory, RolesService rolesService)
         {
@@ -88,14 +93,29 @@ namespace Watchman.Discord.Areas.Administration.Controllers
         [AdminCommand]
         [MessagesCommand("messages")]
         public async Task ReadUserMessages(MessagesCommand command, Contexts contexts)
-        {     
-            var mention = command.User.ToString();
+        {
+            //var mention = command.User.ToString();
+            //var messagesService = this._messagesServiceFactory.Create(contexts);
+
             //await this._directMessagesService.TrySendMessage(contexts.User.Id, "test messages" + mention);
-            var messagesService = this._messagesServiceFactory.Create(contexts);
-            await messagesService.SendResponse(x => x.SentContentOfAskedChannel(contexts.User));
+            //await messagesService.SendResponse(x => x.SentContentOfAskedChannel(contexts.User));
+
+            const string text = "test 123";
+            var messagesService = this._messagesServiceFactory.Create(contexts.User.Id, ToUlong(text));
+            await messagesService.SendMessage(text + " " + command);
         }
 
-        
+        private ulong ToUlong(string value)
+        {
+            ulong result = 0;
+            var match = this._exMention.Match(value);
+            if (match.Success)
+            {
+                var mention = match.Groups["Mention"].Value;
+                result = ulong.Parse(mention);
+            }
+            return result;
+        }
 
         [AdminCommand]
         public async Task SetRoleAsSafe(SetRoleCommand setRoleCommand, Contexts contexts)

@@ -9,7 +9,7 @@ namespace Devscord.DiscordFramework.Framework.Commands.Services
     {
         private readonly Regex _exTime = new Regex(@"(?<Value>\d+)(?<Unit>(ms|d|h|m|s))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         //private readonly Regex _exMention = new Regex(@"<@&?\d+>", RegexOptions.Compiled);
-        private readonly Regex _exMention = new Regex(@"<@&?(?<Mention>\d+)>", RegexOptions.Compiled);
+
 
         public object ConvertType(string value, BotCommandPropertyType type)
         {
@@ -18,21 +18,9 @@ namespace Devscord.DiscordFramework.Framework.Commands.Services
                 BotCommandPropertyType.Time => this.ToTimeSpan(value),
                 BotCommandPropertyType.Number => int.Parse(value),//TODO add more types
                 BotCommandPropertyType.Bool => bool.Parse(value),
-                BotCommandPropertyType.Text => this.ToUlong(value),
+                //BotCommandPropertyType.Text => this.ToUlong(value),
                 _ => value
             };
-        }
-
-        private ulong ToUlong(string value)
-        {
-            ulong result = 0;
-            var match = this._exMention.Match(value);
-            if (match.Success)
-            {
-                var mention = match.Groups["Mention"].Value;
-                result = ulong.Parse(mention);
-            }
-            return result;
         }
 
         private TimeSpan ToTimeSpan(string value)
