@@ -49,18 +49,18 @@ namespace Watchman.Discord.Areas.Statistics.Controllers
             Log.Information("Message saved");
         }
 
-        private readonly Period[] implementedBySplitter = new Period[] { Period.Day }; // only while implementing other splitters / to remove
+       // private readonly Period[] implementedBySplitter = new Period[] { Period.Day }; // only while implementing other splitters / to remove
         [AdminCommand]
         [DiscordCommand("stats")]
         public async Task GetStatisticsPerPeriod(DiscordRequest request, Contexts contexts)
         {
             var period = this._reportsService.SelectPeriod(request.Arguments.FirstOrDefault()?.Value);
-            if (this.implementedBySplitter.Contains(period))
+         //   if (this.implementedBySplitter.Contains(period))
             {
                 var query = new GetMessagesStatisticsQuery(period);
                 var result = await this._queryBus.ExecuteAsync(query);
                 var periodStats = result.PeriodStatistics.Where(x => x.Count > 0);
-                return;
+           //     return;
             }
 
             var getMessages = new GetMessagesQuery(contexts.Server.Id);
