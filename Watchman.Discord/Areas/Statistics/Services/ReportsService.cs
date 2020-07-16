@@ -15,7 +15,7 @@ namespace Watchman.Discord.Areas.Statistics.Services
             {
                 return Period.Hour;
             }
-            else if (period.ToLowerInvariant() == "day")
+            else if  (period.ToLowerInvariant() == "day")
             {
                 return Period.Day;
             }
@@ -23,11 +23,11 @@ namespace Watchman.Discord.Areas.Statistics.Services
             {
                 return Period.Week;
             }
-            else if (period.ToLowerInvariant() == "month")
+            else if  (period.ToLowerInvariant() == "month")
             {
                 return Period.Month;
             }
-            return Period.Day;
+            return Period.Day; //default
         }
 
         //TODO unit test

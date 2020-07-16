@@ -52,11 +52,11 @@ namespace Watchman.Discord.Areas.Statistics.Controllers
         [DiscordCommand("stats")]
         public async Task GetStatisticsPerPeriod(DiscordRequest request, Contexts contexts)
         {
-            var period = this._reportsService.SelectPeriod(request.Arguments.FirstOrDefault()?.Value);
+            var period = this._reportsService.SelectPeriod(request.Arguments.FirstOrDefault()?.Value); //TODO: SelectPeriod refactor
 
             var getMessages = new GetMessagesQuery(contexts.Server.Id);
             var messages = this._queryBus.Execute(getMessages).Messages.ToList();
-            var report = this._reportsService.CreateReport(messages, period);
+            var report = this._reportsService.CreateReport(messages, period); //TODO: CreateReport refactor
             Log.Information("Generated statistics for time range {start} {end}", report.TimeRange.Start, report.TimeRange.End);
 #if DEBUG
             PrintDebugStats(report);
