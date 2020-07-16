@@ -34,7 +34,7 @@ namespace Watchman.DomainModel.UnitTests.Commons.Calculators.Statistics
             Assert.That(daysAreEqual, Is.True);
         }
 
-        [Ignore("Not yet implemented")]
+      //  [Ignore("Not yet implemented")]
         [Test]
         [TestCase]
         [TestCase(5, 20, 4)]
@@ -71,6 +71,33 @@ namespace Watchman.DomainModel.UnitTests.Commons.Calculators.Statistics
             Assert.That(timeRanges.Count(), Is.EqualTo(months));
             Assert.That(itemsPerMonth, Is.EqualTo(shouldItemsPerMonth));
             Assert.That(daysAreEqual, Is.True);
+        }
+
+        //[Ignore("Not yet implemented")]
+        [Test]
+        [TestCase]
+        [TestCase(5, 20, 4)]
+        public void HourSplitterTest()
+        {
+
+        }
+
+        //[Ignore("Not yet implemented")]
+        [Test]
+        [TestCase]
+        [TestCase(5, 20, 4)]
+        public void QuarterSplitterTest()
+        {
+
+        }
+
+        //[Ignore("Not yet implemented")]
+        [Test]
+        [TestCase]
+        [TestCase(5, 20, 4)]
+        public void WeekSplitterTest()
+        {
+
         }
     }
 }
