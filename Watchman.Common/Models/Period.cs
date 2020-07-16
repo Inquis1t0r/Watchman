@@ -5,6 +5,7 @@
         Hour = 1,
         Day = 2,
         Week = 4,
-        Month = 8
+        Month = 8,
+        Quarter = 16,
     }
 }
