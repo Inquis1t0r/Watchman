@@ -54,12 +54,12 @@ namespace Watchman.Discord.Areas.Statistics.Controllers
         [DiscordCommand("stats")]
         public async Task GetStatisticsPerPeriod(DiscordRequest request, Contexts contexts)
         {
-            var period = this._reportsService.SelectPeriod(request.Arguments.FirstOrDefault()?.Value);
+            var period = this._reportsService.SelectPeriod(request.Arguments.FirstOrDefault()?.Value); 
          //   if (this.implementedBySplitter.Contains(period))
             {
                 var query = new GetMessagesStatisticsQuery(period);
                 var result = await this._queryBus.ExecuteAsync(query);
-                var periodStats = result.PeriodStatistics.Where(x => x.Count > 0);
+                //var periodStats = result.PeriodStatistics.Where(x => x.Count > 0);
            //     return;
             }
 
