@@ -8,7 +8,6 @@ using Serilog;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Watchman.Common.Models;
 using Watchman.Cqrs;
 using Watchman.Discord.Areas.Statistics.Models;
 using Watchman.Discord.Areas.Statistics.Services;
@@ -49,19 +48,11 @@ namespace Watchman.Discord.Areas.Statistics.Controllers
             Log.Information("Message saved");
         }
 
-       // private readonly Period[] implementedBySplitter = new Period[] { Period.Day }; // only while implementing other splitters / to remove
         [AdminCommand]
         [DiscordCommand("stats")]
         public async Task GetStatisticsPerPeriod(DiscordRequest request, Contexts contexts)
         {
-            var period = this._reportsService.SelectPeriod(request.Arguments.FirstOrDefault()?.Value); 
-         //   if (this.implementedBySplitter.Contains(period))
-            {
-                var query = new GetMessagesStatisticsQuery(period);
-                var result = await this._queryBus.ExecuteAsync(query);
-                //var periodStats = result.PeriodStatistics.Where(x => x.Count > 0);
-           //     return;
-            }
+            var period = this._reportsService.SelectPeriod(request.Arguments.FirstOrDefault()?.Value);
 
             var getMessages = new GetMessagesQuery(contexts.Server.Id);
             var messages = this._queryBus.Execute(getMessages).Messages.ToList();
