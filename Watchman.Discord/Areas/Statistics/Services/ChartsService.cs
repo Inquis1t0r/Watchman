@@ -29,6 +29,7 @@ namespace Watchman.Discord.Areas.Statistics.Services
                 Period.Day => dates.Select(x => x.ToString("yyyy-MM-dd")),
                 Period.Week => dates.Select(x => x.ToString("yyyy-MM-dd")),
                 Period.Month => dates.Select(x => x.ToString("yyyy-MM")),
+                Period.Quarter => dates.Select(x => x.ToString("yyyy-MM")),
                 _ => new List<string>()
             };
 
