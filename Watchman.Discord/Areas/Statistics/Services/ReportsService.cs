@@ -27,7 +27,7 @@ namespace Watchman.Discord.Areas.Statistics.Services
             {
                 return Period.Month;
             }
-            return Period.Day; //default
+            return Period.Hour; //default
         }
 
         //TODO unit test
