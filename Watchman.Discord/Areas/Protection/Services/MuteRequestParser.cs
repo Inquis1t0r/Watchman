@@ -14,7 +14,7 @@ namespace Watchman.Discord.Areas.Protection.Services
         private readonly DiscordRequest _request;
         private readonly UsersService _usersService;
         private readonly Contexts _contexts;
-
+        //TODO Regex detecting mention/Id
         public MuteRequestParser(DiscordRequest request, UsersService usersService, Contexts contexts)
         {
             this._request = request;
@@ -25,6 +25,7 @@ namespace Watchman.Discord.Areas.Protection.Services
         public UserContext GetUser()
         {
             var mention = this._request.GetMention();
+            //TODO: Regex -> Bool -> userToMute (GetUserByMention/GetUserById)
             var userToMute = this._usersService.GetUserByMention(this._contexts.Server, mention);
 
             if (userToMute == null)
