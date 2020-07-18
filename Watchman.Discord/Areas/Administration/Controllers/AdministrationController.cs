@@ -43,78 +43,112 @@ namespace Watchman.Discord.Areas.Administration.Controllers
         }
 
         [AdminCommand]
-        [DiscordCommand("oldmessages")]
-        public async Task OldReadUserMessages(DiscordRequest request, Contexts contexts)
+        [DiscordCommand("messages")]
+        public async Task ReadUserMessages(DiscordRequest request, Contexts contexts)
         {
-            //user
-            var mention = request.GetMention();
-            var selectedUser = this._usersService.GetUserByMention(contexts.Server, mention);
-            if (selectedUser == null)
+            var hasUserArgument = request.HasArgument("user");
+            if (hasUserArgument)
             {
-                throw new UserNotFoundException(mention);
+                var mention = request.GetMention();
+                var selectedUser = this._usersService.GetUserByMention(contexts.Server, mention);
+                if (selectedUser == null)
+                {
+                    throw new UserNotFoundException(mention);
+                }
+
+                var timeRange = request.GetPastTimeRange(defaultTime: TimeSpan.FromHours(1)); 
+                var query = new GetMessagesQuery(contexts.Server.Id, selectedUser.Id)
+                {
+                    SentDate = timeRange
+                };
+
+                //TODO channel
+
+                var messages = this._queryBus.Execute(query).Messages
+                    .OrderBy(x => x.SentAt)
+                    .ToList();
+
+                var messagesService = this._messagesServiceFactory.Create(contexts);
+                var hasForceArgument = request.HasArgument("force") || request.HasArgument("f");
+
+                if (messages.Count > 200 && !hasForceArgument)
+                {
+                    await messagesService.SendResponse(x => x.NumberOfMessagesIsHuge(messages.Count));
+                    return;
+                }
+
+                if (!messages.Any())
+                {
+                    await messagesService.SendResponse(x => x.UserDidntWriteAnyMessageInThisTime(selectedUser));
+                    return;
+                }
+
+                var header = $"Messages from user {selectedUser} starting at {timeRange.Start}";
+                var lines = messages.Select(x =>
+                    $"{x.SentAt:yyyy-MM-dd HH:mm:ss} {x.Author.Name}: {x.Content.Replace("```", "")}");
+                var linesBuilder = new StringBuilder().PrintManyLines(lines.ToArray(), contentStyleBox: true);
+
+                await this._directMessagesService.TrySendMessage(contexts.User.Id, header);
+                await this._directMessagesService.TrySendMessage(contexts.User.Id, linesBuilder.ToString(),
+                    MessageType.BlockFormatted);
+
+                await messagesService.SendResponse(x => x.SentByDmMessagesOfAskedUser(messages.Count, selectedUser));
             }
-
-            var timeRange = request.GetPastTimeRange(defaultTime: TimeSpan.FromHours(1));
-            var query = new GetMessagesQuery(contexts.Server.Id, selectedUser.Id)
-            {
-                SentDate = timeRange
-            };
-            var messages = this._queryBus.Execute(query).Messages
-                .OrderBy(x => x.SentAt)
-                .ToList();
-
-            var messagesService = this._messagesServiceFactory.Create(contexts);
-            var hasForceArgument = request.HasArgument("force") || request.HasArgument("f");
-
-            if (messages.Count > 200 && !hasForceArgument)
-            {
-                await messagesService.SendResponse(x => x.NumberOfMessagesIsHuge(messages.Count));
-                return;
-            }
-
-            if (!messages.Any())
-            {
-                await messagesService.SendResponse(x => x.UserDidntWriteAnyMessageInThisTime(selectedUser));
-                return;
-            }
-
-            var header = $"Messages from user {selectedUser} starting at {timeRange.Start}";
-            var lines = messages.Select(x => $"{x.SentAt:yyyy-MM-dd HH:mm:ss} {x.Author.Name}: {x.Content.Replace("```", "")}");
-            var linesBuilder = new StringBuilder().PrintManyLines(lines.ToArray(), contentStyleBox: true);
-
-            await this._directMessagesService.TrySendMessage(contexts.User.Id, header);
-            await this._directMessagesService.TrySendMessage(contexts.User.Id, linesBuilder.ToString(), MessageType.BlockFormatted);
-
-            await messagesService.SendResponse(x => x.SentByDmMessagesOfAskedUser(messages.Count, selectedUser));
-
-            //TODO channel
         }
 
         [AdminCommand]
-        [MessagesCommand("messages")]
-        public async Task ReadUserMessages(MessagesCommand command, Contexts contexts)
+        [DiscordCommand("messages")]
+        public async Task ReadChannelMessages(DiscordRequest request, Contexts contexts)
         {
-            //var mention = command.User.ToString();
-            //var messagesService = this._messagesServiceFactory.Create(contexts);
-
-            //await this._directMessagesService.TrySendMessage(contexts.User.Id, "test messages" + mention);
-            //await messagesService.SendResponse(x => x.SentContentOfAskedChannel(contexts.User));
-
-            const string text = "test 123";
-            var messagesService = this._messagesServiceFactory.Create(contexts.User.Id, ToUlong(text));
-            await messagesService.SendMessage(text + " " + command);
-        }
-
-        private ulong ToUlong(string value)
-        {
-            ulong result = 0;
-            var match = this._exMention.Match(value);
-            if (match.Success)
+            var hasChannelArgument = request.HasArgument("channel");
+            if (hasChannelArgument)
             {
-                var mention = match.Groups["Mention"].Value;
-                result = ulong.Parse(mention);
+                var mention = request.GetMention();
+
+                var selectedUser = this._usersService.GetUserByMention(contexts.Server, mention);
+                if (selectedUser == null)
+                {
+                    throw new UserNotFoundException(mention);
+                }
+
+                var timeRange = request.GetPastTimeRange(defaultTime: TimeSpan.FromHours(1));
+                var query = new GetMessagesQuery(contexts.Server.Id, selectedUser.Id)
+                {
+                    SentDate = timeRange
+                };
+
+                //TODO channel
+
+                var messages = this._queryBus.Execute(query).Messages
+                    .OrderBy(x => x.SentAt)
+                    .ToList();
+
+                var messagesService = this._messagesServiceFactory.Create(contexts);
+                var hasForceArgument = request.HasArgument("force") || request.HasArgument("f");
+
+                if (messages.Count > 200 && !hasForceArgument)
+                {
+                    await messagesService.SendResponse(x => x.NumberOfMessagesIsHuge(messages.Count));
+                    return;
+                }
+
+                if (!messages.Any())
+                {
+                    await messagesService.SendResponse(x => x.UserDidntWriteAnyMessageInThisTime(selectedUser));
+                    return;
+                }
+
+                var header = $"Messages from user {selectedUser} starting at {timeRange.Start}";
+                var lines = messages.Select(x =>
+                    $"{x.SentAt:yyyy-MM-dd HH:mm:ss} {x.Author.Name}: {x.Content.Replace("```", "")}");
+                var linesBuilder = new StringBuilder().PrintManyLines(lines.ToArray(), contentStyleBox: true);
+
+                await this._directMessagesService.TrySendMessage(contexts.User.Id, header);
+                await this._directMessagesService.TrySendMessage(contexts.User.Id, linesBuilder.ToString(),
+                    MessageType.BlockFormatted);
+
+                await messagesService.SendResponse(x => x.SentByDmMessagesOfAskedUser(messages.Count, selectedUser));
             }
-            return result;
         }
 
         [AdminCommand]
