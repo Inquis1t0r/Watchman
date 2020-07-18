@@ -15,6 +15,7 @@ namespace Watchman.DomainModel.UnitTests
         public static IEnumerable<TestEntity> Generate(TimeRange timeRange, int quantity)
         {
             var days = timeRange.DaysBetween;
+
             var itemsPerDay = quantity / days;
             foreach (var dayIndex in Enumerable.Range(0, days))
             {

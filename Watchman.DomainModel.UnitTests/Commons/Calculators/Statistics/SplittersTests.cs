@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Linq;
+using Serilog;
 using Watchman.Common.Models;
 using Watchman.DomainModel.Commons.Calculators.Statistics.Splitters;
 
@@ -77,9 +78,10 @@ namespace Watchman.DomainModel.UnitTests.Commons.Calculators.Statistics
         [Test]
         [TestCase]
         [TestCase(5, 20, 4)]
-        public void HourSplitterTest()
+        public void HourSplitterTest(int hours, int items, int shouldItemsPerHour)
         {
-
+            var splitter = new HourSplitter();
+            var timeRange = TimeRange.Create(DateTime.Now, DateTime.Now.AddHours(-1));
         }
 
         //[Ignore("Not yet implemented")]
