@@ -20,6 +20,8 @@ namespace Watchman.Discord.Areas.Commons
             return mention;
         }
 
+        //TODO: GetId
+
         public static TimeRange GetFutureTimeRange(this DiscordRequest discordRequest, TimeSpan defaultTime)
         {
             return new TimeRange(
