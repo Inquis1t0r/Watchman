@@ -27,7 +27,7 @@ namespace Watchman.Discord.Areas.Protection.Controllers
         {
             var requestParser = new MuteRequestParser(request, this._usersService, contexts);
             var userToMute = requestParser.GetUser();
-            var muteEvent = requestParser.GetMuteEvent(userToMute.Id, contexts, request);
+            var muteEvent = requestParser.GetMuteEvent((ulong)userToMute.Id, contexts, request);
 
             await this._mutingService.MuteUserOrOverwrite(contexts, muteEvent, userToMute);
             this._unmutingService.UnmuteInFuture(contexts, muteEvent, userToMute);

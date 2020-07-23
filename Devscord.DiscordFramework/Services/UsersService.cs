@@ -65,13 +65,17 @@ namespace Devscord.DiscordFramework.Services
 
         public async Task<UserContext> GetUserByIdAsync(DiscordServerContext server, ulong userId)
         {
+            //var match = this._exMention.Match(userId);
             var user = await Server.GetGuildUser(userId, server.Id);
             if(user == null)
             {
                 Log.Warning("Cannot get user by id {userId}", userId);
                 return null;
             }
+           // var id = ulong.Parse(match.Value);
             return this._userContextsFactory.Create(user);
+            //return user;
+
         }
 
         public DateTime? GetUserJoinedDateTime(ulong userId, ulong serverId)
