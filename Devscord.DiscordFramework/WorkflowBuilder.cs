@@ -51,7 +51,8 @@ namespace Devscord.DiscordFramework
             this._workflow
                 .AddMiddleware<ChannelMiddleware>()
                 .AddMiddleware<ServerMiddleware>()
-                .AddMiddleware<UserMiddleware>();
+                .AddMiddleware<UserMiddleware>()
+                .AddMiddleware<MessageMiddleware>();
             Log.Debug("Default middlewares added");
             return this;
         }
@@ -144,7 +145,7 @@ namespace Devscord.DiscordFramework
             this._client.LoginAsync(TokenType.Bot, this._token).Wait();
             this._client.StartAsync().Wait();
 
-            ServerInitializer.Initialize(this._client);
+            ServerInitializer.Initialize(this._client, this._context);
             return this;
         }
     }

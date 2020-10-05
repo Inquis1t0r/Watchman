@@ -9,6 +9,7 @@ using Watchman.Discord.Areas.Protection.Services;
 using Watchman.Discord.Areas.Protection.Strategies;
 using Watchman.Discord.Areas.Responses.Services;
 using Watchman.Discord.Areas.Statistics.Services;
+using Watchman.DomainModel.Settings.Services;
 
 namespace Watchman.Web
 {
@@ -19,10 +20,11 @@ namespace Watchman.Web
             var generators = new List<(ICyclicService, RefreshFrequent, bool shouldTriggerNow)>
             {
                 (container.Resolve<MessagesService>(), RefreshFrequent.Quarterly, true),
+                (container.Resolve<ServerMessagesCacheService>(), RefreshFrequent.Quarterly, false),
+                (container.Resolve<ResponsesCleanupService>(), RefreshFrequent.Daily, false),
                 (container.Resolve<UnmutingService>(), RefreshFrequent.Quarterly, true), // if RefreshFrequent changed remember to change SHORT_MUTE_TIME_IN_MINUTES in unmutingService!
-                (container.Resolve<CheckUserSafetyService>(), RefreshFrequent.Daily, true),
                 (container.Resolve<CyclicStatisticsGeneratorService>(), RefreshFrequent.Daily, false),
-                (container.Resolve<ServerMessagesCacheService>(), RefreshFrequent.Quarterly, false)
+                (container.Resolve<CheckUserSafetyService>(), RefreshFrequent.Daily, true)
             };
             var recurringJobManager = container.Resolve<IRecurringJobManager>();
             foreach (var (generator, refreshFrequent, shouldTrigger) in generators)
@@ -34,8 +36,8 @@ namespace Watchman.Web
                     recurringJobManager.Trigger(generator.GetType().Name);
                 }
             }
-            var responseCleanupService = container.Resolve<ResponseCleanupService>();
-            recurringJobManager.AddOrUpdate(nameof(ResponseCleanupService), () => responseCleanupService.CleanDuplicatedResponses(), Cron.Daily());
+            var service = container.Resolve<ConfigurationService>();
+            recurringJobManager.AddOrUpdate(nameof(ConfigurationService), () => service.Refresh(), this.GetCronExpression(RefreshFrequent.Minutely));
         }
 
         private string GetCronExpression(RefreshFrequent refreshFrequent)

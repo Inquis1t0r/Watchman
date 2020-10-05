@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Autofac;
 using Devscord.DiscordFramework.Integration;
 using Devscord.DiscordFramework.Middlewares.Contexts;
 using Devscord.DiscordFramework.Middlewares.Factories;
+using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
 using Serilog;
@@ -17,9 +19,9 @@ namespace Devscord.DiscordFramework.Services
         private readonly UserContextsFactory _userContextsFactory;
         private readonly Regex _exMention = new Regex(@"\d+", RegexOptions.Compiled);
 
-        public UsersService()
+        public UsersService(IComponentContext context)
         {
-            this._userContextsFactory = new UserContextsFactory();
+            this._userContextsFactory = new UserContextsFactory(context, this);
         }
 
         public async Task AddRoleAsync(UserRole role, UserContext user, DiscordServerContext server)
@@ -78,9 +80,14 @@ namespace Devscord.DiscordFramework.Services
 
         }
 
-        public DateTime? GetUserJoinedDateTime(ulong userId, ulong serverId)
+        public DateTime? GetUserJoinedServerAt(ulong userId, ulong serverId)
         {
             return Server.GetGuildUser(userId, serverId).Result?.JoinedAt?.DateTime;
+        }
+
+        internal DateTime? GetUserJoinedServerAt(IGuildUser user)
+        {
+            return user.JoinedAt?.DateTime;
         }
 
         public UserContext GetBot()

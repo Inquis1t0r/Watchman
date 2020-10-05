@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Devscord.DiscordFramework.Commons.Exceptions;
 using Watchman.Discord.Areas.Help.Services;
 using Watchman.Discord.Areas.Initialization.Services;
 using Watchman.Discord.Areas.Protection.Services;
@@ -57,25 +58,17 @@ namespace Watchman.Discord
                         {
                             await responsesService.InitNewResponsesFromResources();
                         })
-                        .AddFromIoC<InitializationService, DiscordServersService>((initService, serversService) => () =>
+                        .AddFromIoC<InitializationService, DiscordServersService>((initService, serversService) => async () =>
                         {
                             var stopwatch = Stopwatch.StartNew();
                             // when bot was offline for less than 1 minutes, it doesn't make sense to init all servers
                             if (WorkflowBuilder.DisconnectedTimes.LastOrDefault() > DateTime.Now.AddMinutes(-1))
                             {
                                 Log.Information("Bot was connected less than 1 minute ago");
-                                return Task.CompletedTask;
+                                return;
                             }
-                            var servers = serversService.GetDiscordServers().Result;
-                            Task.WaitAll(servers.Select(async server =>
-                            {
-                                Log.Information("Initializing server: {server}", server.ToJson());
-                                await initService.InitServer(server);
-                                Log.Information("Done server: {server}", server.ToJson());
-                            }).ToArray());
-
+                            await serversService.GetDiscordServersAsync().ForEachAwaitAsync(initService.InitServer);
                             Log.Information(stopwatch.ElapsedMilliseconds.ToString());
-                            return Task.CompletedTask;
                         })
                         .AddHandler(() => Task.Run(() => Log.Information("Bot has done every Ready tasks.")));
                 })
@@ -95,6 +88,7 @@ namespace Watchman.Discord
                     builder
                         .AddFromIoC<ExceptionHandlerService>(x => x.LogException)
                         .AddHandler(this.PrintDebugExceptionInfo, onlyOnDebug: true)
+                        .AddHandler(this.SendExceptionInfo)
                         .AddHandler(this.PrintExceptionOnConsole);
                 })
                 .AddOnChannelCreatedHandlers(builder =>
@@ -102,6 +96,19 @@ namespace Watchman.Discord
                     builder
                         .AddFromIoC<MuteRoleInitService>(x => (_, server) => x.InitForServer(server));
                 });
+        }
+
+        private void SendExceptionInfo(Exception e, Contexts contexts)
+        {
+            var exceptionMessage = this.BuildExceptionMessage(e).ToString();
+            var messagesService = this._context.Resolve<MessagesServiceFactory>().Create(contexts);
+            messagesService.ChannelId = this._configuration.ExceptionChannelID;
+            var isBotException = e.InnerException is BotException;
+            if (isBotException && this._configuration.SendOnlyUnknownExceptionInfo)
+            {
+                return;
+            }
+            messagesService.SendMessage(exceptionMessage, Devscord.DiscordFramework.Commons.MessageType.BlockFormatted);
         }
 
         private void PrintDebugExceptionInfo(Exception e, Contexts contexts)

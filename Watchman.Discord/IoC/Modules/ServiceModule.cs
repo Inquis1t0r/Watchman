@@ -3,10 +3,12 @@ using Devscord.DiscordFramework;
 using Devscord.DiscordFramework.Framework.Commands.Responses;
 using System.Collections.Generic;
 using System.Reflection;
+using Devscord.DiscordFramework.Framework.Commands.Parsing;
 using Watchman.Cqrs;
 using Watchman.Discord.Areas.Commons;
 using Watchman.Discord.Integration.DevscordFramework;
 using Watchman.DomainModel.Commons.Calculators.Statistics;
+using Watchman.DomainModel.Settings.Services;
 
 namespace Watchman.Discord.IoC.Modules
 {
@@ -24,6 +26,14 @@ namespace Watchman.Discord.IoC.Modules
 
             builder.RegisterType<CustomCommandsLoader>()
                 .As<ICustomCommandsLoader>()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterType<CommandParser>()
+                .As<CommandParser>()
+                .SingleInstance();
+
+            builder.RegisterType<ConfigurationService>()
+                .As<IConfigurationService>()
                 .InstancePerLifetimeScope();
 
             var list = new List<string>();

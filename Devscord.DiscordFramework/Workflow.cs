@@ -20,8 +20,8 @@ namespace Devscord.DiscordFramework
     internal class Workflow
     {
         private readonly IComponentContext _context;
-        private readonly CommandParser _commandParser = new CommandParser();
-        private readonly MiddlewaresService _middlewaresService = new MiddlewaresService();
+        private readonly CommandParser _commandParser;
+        private readonly MiddlewaresService _middlewaresService;
         private readonly ControllersService _controllersService;
         private readonly Stopwatch _stopWatch = new Stopwatch();
 
@@ -39,6 +39,8 @@ namespace Devscord.DiscordFramework
         {
             this._context = context;
             this._controllersService = new ControllersService(context, botAssembly, context.Resolve<BotCommandsService>(), context.Resolve<CommandsContainer>());
+            this._commandParser = context.Resolve<CommandParser>();
+            this._middlewaresService = context.Resolve<MiddlewaresService>();
         }
 
         internal Workflow AddMiddleware<T>() where T : IMiddleware
@@ -188,13 +190,7 @@ namespace Devscord.DiscordFramework
             var discordServer = this._context.Resolve<DiscordServerContextFactory>().Create(guild);
             var landingChannel = discordServer.LandingChannel;
 
-            var contexts = new Contexts();
-            contexts.SetContext(userContext);
-            contexts.SetContext(discordServer);
-            if (landingChannel != null)
-            {
-                contexts.SetContext(landingChannel);
-            }
+            var contexts = new Contexts(discordServer, landingChannel, userContext);
             Log.Information("User joined to server {contexts}", contexts.ToJson());
             this.OnUserJoined.ForEach(x => x.Invoke(contexts));
         }
